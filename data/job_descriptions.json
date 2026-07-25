@@ -1,0 +1,13 @@
+[
+    {
+        "title": "Python developer",
+        "raw_text": "a python and form c++ has to be an java file",
+        "cleaned_text": "a python and form cplusplus has to be an java file",
+        "required_skills": [
+            "python",
+            "java",
+            "cplusplus"
+        ],
+        "job_id": 1
+    }
+]

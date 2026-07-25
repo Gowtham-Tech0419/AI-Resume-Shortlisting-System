@@ -10,13 +10,29 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
+PROTECTED_TERMS = {
+    'c++': 'cplusplus',
+    'c#': 'csharp',
+    'node.js': 'nodejs',
+    'react.js': 'reactjs',
+    'vue.js': 'vuejs',
+    'asp.net': 'aspnet',
+    '.net': 'dotnet',
+    'ci/cd': 'cicd',
+}
+
+def protect_special_terms(text):
+    for original, placeholder in PROTECTED_TERMS.items():
+        text = text.replace(original, ' ' + placeholder + ' ')
+    return text
+
 def clean_text(text):
     text = text.lower()
-    text = re.sub(r'[^a-zA-Z\s]', '', text)
+    text = protect_special_terms(text)
+    text = re.sub(r'[^a-zA-Z\s]', ' ', text)
     text = re.sub(r'\s+', ' ', text)
     text = text.strip()
     return text
-
 
 def tokenize_and_remove_stopwords(text):
     tokens = word_tokenize(text)

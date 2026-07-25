@@ -1,0 +1,6 @@
+{
+    "programming_languages": ["python", "java", "cplusplus", "csharp", "javascript", "sql", "html", "css", "php"],
+    "ml_ai": ["machine learning", "deep learning", "tensorflow", "pytorch", "nlp"],
+    "tools_platforms": ["docker", "aws", "git", "kubernetes", "power bi"],
+    "web_development": ["react", "html", "css", "flask", "django", "nodejs", "reactjs", "vuejs", "dotnet"]
+}
