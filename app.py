@@ -3,6 +3,7 @@ from utils.resume_parser import extract_text_from_pdf
 from utils.text_cleaner import clean_text, preprocess_resume_text
 from utils.skill_extractor import get_candidate_skills
 from utils.jd_processor import process_job_description, save_job_description
+from utils.vectorizer import create_tfidf_vectors, display_tfidf_matrix
 
 app = Flask(__name__)
 
@@ -49,6 +50,17 @@ def submit_jd():
     <h3>Required Skills Detected:</h3>
     <pre>{job_data['required_skills']}</pre>
     """
+@app.route('/test_vectors')
+def test_vectors():
+    sample_documents = [
+        "python sql docker experience",
+        "python java machine learning",
+        "sql docker aws kubernetes"
+    ]
+    tfidf_matrix, vectorizer = create_tfidf_vectors(sample_documents)
+    table = display_tfidf_matrix(tfidf_matrix, vectorizer)
+
+    return f"<pre>{table.to_string()}</pre>"
 
 if __name__ == '__main__':
     app.run(debug=True)
