@@ -6,6 +6,7 @@ from utils.jd_processor import process_job_description, save_job_description
 from utils.vectorizer import create_tfidf_vectors, display_tfidf_matrix
 from utils.similarity_engine import vectorize_resume_and_job, calculate_similarity, rank_candidates
 from utils.classifier import load_model, predict_category
+from utils.db_manager import insert_candidate, insert_job, insert_score, get_job, get_ranked_candidates_for_job
 
 app = Flask(__name__)
 
@@ -118,6 +119,56 @@ def predict_category_route():
 
     return f"<h2>Predicted Category: {predicted}</h2>"
 
+from utils.classifier import predict_category
 
+
+@app.route('/compare_and_save/<int:job_id>', methods=['POST'])
+def compare_and_save(job_id):
+    job_record = get_job(job_id)
+    if job_record is None:
+        return f"No job found with ID {job_id}", 404
+
+    file = request.files['resume']
+    file_path = app.config['UPLOAD_FOLDER'] + '/' + file.filename
+    file.save(file_path)
+
+    extracted_text = extract_text_from_pdf(file_path)
+    cleaned = clean_text(extracted_text)
+    candidate_skills = get_candidate_skills(cleaned)
+    predicted = predict_category(cleaned, model, vectorizer)
+
+    candidate_id = insert_candidate(file.filename, file_path, predicted, candidate_skills)
+
+    resume_vector, job_vector = vectorize_resume_and_job(cleaned, job_record['cleaned_text'])
+    score = calculate_similarity(resume_vector, job_vector)
+
+    insert_score(candidate_id, job_id, float(score))
+
+    return f"""
+    <h2>Saved! Match Score: {round(score * 100, 2)}%</h2>
+    <h3>Predicted Category: {predicted}</h3>
+    """
+
+
+@app.route('/rankings/<int:job_id>')
+def rankings(job_id):
+    job_record = get_job(job_id)
+    if job_record is None:
+        return f"No job found with ID {job_id}", 404
+
+    ranked = get_ranked_candidates_for_job(job_id)
+
+    rows_html = ""
+    for name, category, score in ranked:
+        rows_html += f"<tr><td>{name}</td><td>{category}</td><td>{round(score * 100, 2)}%</td></tr>"
+
+    return f"""
+    <h2>Rankings for: {job_record['title']}</h2>
+    <table border="1">
+        <tr><th>Candidate</th><th>Predicted Category</th><th>Match Score</th></tr>
+        {rows_html}
+    </table>
+    """
+    
 if __name__ == '__main__':
     app.run(debug=True)
