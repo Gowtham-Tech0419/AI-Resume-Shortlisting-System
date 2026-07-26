@@ -4,6 +4,8 @@ from utils.text_cleaner import clean_text, preprocess_resume_text
 from utils.skill_extractor import get_candidate_skills
 from utils.jd_processor import process_job_description, save_job_description
 from utils.vectorizer import create_tfidf_vectors, display_tfidf_matrix
+from utils.similarity_engine import vectorize_resume_and_job, calculate_similarity, rank_candidates
+from utils.classifier import load_model, predict_category
 
 app = Flask(__name__)
 
@@ -61,6 +63,61 @@ def test_vectors():
     table = display_tfidf_matrix(tfidf_matrix, vectorizer)
 
     return f"<pre>{table.to_string()}</pre>"
+
+@app.route('/compare/<int:job_id>', methods=['POST'])
+def compare_resume_to_job(job_id):
+    import json
+
+    file = request.files['resume']
+    file_path = app.config['UPLOAD_FOLDER'] + '/' + file.filename
+    file.save(file_path)
+
+    extracted_text = extract_text_from_pdf(file_path)
+    resume_cleaned = clean_text(extracted_text)
+
+    with open('data/job_descriptions.json', 'r') as f:
+        all_jobs = json.load(f)
+
+    job_record = None
+    for job in all_jobs:
+        if job['job_id'] == job_id:
+            job_record = job
+            break
+
+    if job_record is None:
+        return f"No job found with ID {job_id}", 404
+
+    resume_vector, job_vector = vectorize_resume_and_job(resume_cleaned, job_record['cleaned_text'])
+    score = calculate_similarity(resume_vector, job_vector)
+
+    return f"""
+    <h2>Match Score: {round(score * 100, 2)}%</h2>
+    <h3>Job: {job_record['title']}</h3>
+    <h3>Required Skills: {job_record['required_skills']}</h3>
+    
+    """
+@app.route('/compare_page')
+def compare_page():
+    return render_template('compare.html')
+
+
+model, vectorizer = load_model()
+
+print(model)
+
+@app.route('/predict_category', methods=['POST'])
+def predict_category_route():
+    file = request.files['resume']
+    file_path = app.config['UPLOAD_FOLDER'] + '/' + file.filename
+    file.save(file_path)
+
+    extracted_text = extract_text_from_pdf(file_path)
+    cleaned = clean_text(extracted_text)
+
+    predicted = predict_category(cleaned, model, vectorizer)
+
+    return f"<h2>Predicted Category: {predicted}</h2>"
+
 
 if __name__ == '__main__':
     app.run(debug=True)
