@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Resume Shortlisting System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+</head>
+<body>
+
+    <nav class="tab-bar">
+        <button class="tab-btn active" onclick="showSection('candidate')">I'm a Candidate</button>
+        <button class="tab-btn" onclick="showSection('postjob')">I'm HR — Post a Job</button>
+        <button class="tab-btn" onclick="showSection('viewdash')">I'm HR — View Dashboard</button>
+    </nav>
+
+    <main class="container">
+
+        <section id="candidate" class="tab-section active">
+            <h2>Upload Your Resume</h2>
+            <form id="resumeForm">
+                <input type="file" name="resume" id="resumeInput" accept=".pdf" required>
+                <button type="submit" class="btn">Upload</button>
+            </form>
+            <div id="resumeResult" class="result-box"></div>
+        </section>
+
+        <section id="postjob" class="tab-section">
+            <h2>Post a Job Description</h2>
+            <form id="jdForm">
+                <input type="text" name="job_title" id="jobTitleInput" placeholder="Job Title" required>
+                <textarea name="job_description" id="jobDescInput" rows="6" placeholder="Paste job description here..." required></textarea>
+                <button type="submit" class="btn">Save Job</button>
+            </form>
+            <div id="jdResult" class="result-box"></div>
+        </section>
+
+        <section id="viewdash" class="tab-section">
+            <h2>View Candidate Dashboard</h2>
+            <label for="jobSelect">Select a Job:</label>
+            <select id="jobSelect">
+                <option value="">-- Choose a job --</option>
+                {% for job_id, job_title in jobs %}
+                    <option value="{{ job_id }}">{{ job_title }} (ID {{ job_id }})</option>
+                {% endfor %}
+            </select>
+            <button class="btn" onclick="goToDashboard()">View Dashboard</button>
+        </section>
+
+    </main>
+
+    <script src="{{ url_for('static', filename='home.js') }}"></script>
+</body>
+</html>

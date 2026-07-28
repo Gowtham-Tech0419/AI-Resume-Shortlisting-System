@@ -1,6 +1,79 @@
 {
-    "programming_languages": ["python", "java", "cplusplus", "csharp", "javascript", "sql", "html", "css", "php"],
-    "ml_ai": ["machine learning", "deep learning", "tensorflow", "pytorch", "nlp"],
-    "tools_platforms": ["docker", "aws", "git", "kubernetes", "power bi"],
-    "web_development": ["react", "html", "css", "flask", "django", "nodejs", "reactjs", "vuejs", "dotnet"]
+    "programming_languages": [
+        "python", "java", "cplusplus", "csharp", "javascript", "typescript",
+        "sql", "golang", "rprogramming", "php", "ruby", "swift", "kotlin",
+        "scala", "perl", "matlab", "objectivec", "fsharp", "dart", "rust",
+        "html", "css", "shell scripting", "bash", "powershell"
+    ],
+    "web_development": [
+        "react", "reactjs", "angular", "vuejs", "nextjs", "nuxtjs", "expressjs",
+        "flask", "django", "fastapi", "spring boot", "asp.net core", "aspnet",
+        "dotnet", "laravel", "ruby on rails", "jquery", "bootstrap", "tailwind css",
+        "webpack", "graphql", "rest api", "soap", "websocket", "emberjs",
+        "backbonejs", "d3js", "threejs"
+    ],
+    "mobile_development": [
+        "android", "ios", "flutter", "react native", "swiftui", "xamarin",
+        "ionic", "kotlin multiplatform"
+    ],
+    "databases": [
+        "mysql", "postgresql", "mongodb", "sqlite", "oracle", "redis",
+        "cassandra", "dynamodb", "elasticsearch", "firebase", "mariadb",
+        "microsoft sql server", "neo4j", "couchbase", "supabase"
+    ],
+    "cloud_devops": [
+        "aws", "azure", "gcp", "docker", "kubernetes", "terraform", "ansible",
+        "jenkins", "git", "github actions", "gitlab ci", "circleci", "helm",
+        "prometheus", "grafana", "nginx", "apache", "linux", "unix",
+        "ci cd", "cicd", "cloudformation", "openshift"
+    ],
+    "data_science_ml_ai": [
+        "machine learning", "deep learning", "tensorflow", "pytorch", "keras",
+        "scikit learn", "pandas", "numpy", "opencv", "nlp", "computer vision",
+        "reinforcement learning", "generative ai", "large language models",
+        "hugging face", "xgboost", "lightgbm", "mlflow", "airflow",
+        "data mining", "statistics", "a b testing", "feature engineering",
+        "neural networks", "transformers", "spark", "hadoop", "pyspark",
+        "data warehousing", "etl"
+    ],
+    "data_analytics_bi": [
+        "power bi", "tableau", "excel", "google sheets", "looker",
+        "qlikview", "sas", "spss", "data visualization", "kpi reporting",
+        "google analytics", "sql server reporting services"
+    ],
+    "design_ui_ux": [
+        "figma", "adobe xd", "sketch", "photoshop", "illustrator",
+        "canva", "wireframing", "prototyping", "user research",
+        "interaction design", "invision"
+    ],
+    "testing_qa": [
+        "selenium", "junit", "pytest", "cypress", "postman", "jmeter",
+        "manual testing", "automation testing", "test driven development",
+        "unit testing", "integration testing", "load testing", "appium"
+    ],
+    "cybersecurity": [
+        "penetration testing", "ethical hacking", "network security",
+        "owasp", "siem", "cryptography", "firewall configuration",
+        "vulnerability assessment", "iso 27001", "burp suite", "nmap",
+        "wireshark", "identity and access management"
+    ],
+    "project_management_tools": [
+        "jira", "confluence", "trello", "asana", "agile", "scrum",
+        "kanban", "sap", "salesforce", "servicenow", "microsoft project",
+        "monday.com", "notion"
+    ],
+    "business_erp_finance": [
+        "sap erp", "oracle erp", "quickbooks", "tally", "netsuite",
+        "financial modeling", "budgeting", "forecasting", "audit",
+        "accounts payable", "accounts receivable", "gst", "taxation"
+    ],
+    "networking_systems": [
+        "tcp ip", "dns", "dhcp", "vpn", "load balancing", "ccna",
+        "network administration", "active directory", "vmware", "citrix"
+    ],
+    "soft_skills": [
+        "communication", "leadership", "teamwork", "problem solving",
+        "time management", "critical thinking", "stakeholder management",
+        "conflict resolution", "adaptability", "presentation skills"
+    ]
 }

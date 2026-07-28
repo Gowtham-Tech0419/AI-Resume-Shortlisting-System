@@ -4,18 +4,22 @@ from utils.text_cleaner import clean_text, preprocess_resume_text
 from utils.skill_extractor import get_candidate_skills
 from utils.jd_processor import process_job_description, save_job_description
 from utils.vectorizer import create_tfidf_vectors, display_tfidf_matrix
-from utils.similarity_engine import vectorize_resume_and_job, calculate_similarity, rank_candidates
+from utils.similarity_engine import vectorize_resume_and_job, calculate_similarity, rank_candidates,calculate_skill_overlap
 from utils.classifier import load_model, predict_category
 from utils.db_manager import insert_candidate, insert_job, insert_score, get_job, get_ranked_candidates_for_job
+from flask import jsonify
+from utils.db_manager import get_all_jobs, insert_candidate
+from utils.jd_processor import process_job_description
+from utils.similarity_engine import compute_scores_for_job
 
 app = Flask(__name__)
 
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+# @app.route('/')
+# def home():
+#     return render_template('index.html')
 
 @app.route('/upload', methods=['POST'])
 def upload_resume():
@@ -136,19 +140,20 @@ def compare_and_save(job_id):
     cleaned = clean_text(extracted_text)
     candidate_skills = get_candidate_skills(cleaned)
     predicted = predict_category(cleaned, model, vectorizer)
-
-    candidate_id = insert_candidate(file.filename, file_path, predicted, candidate_skills)
+    candidate_id = insert_candidate(file.filename, file_path, cleaned, predicted, candidate_skills)
 
     resume_vector, job_vector = vectorize_resume_and_job(cleaned, job_record['cleaned_text'])
-    score = calculate_similarity(resume_vector, job_vector)
+    text_score = calculate_similarity(resume_vector, job_vector)
 
-    insert_score(candidate_id, job_id, float(score))
+    skill_score = calculate_skill_overlap(job_record['required_skills'], candidate_skills)
+    final_score = (0.6 * skill_score) + (0.4 * text_score)
+
+    insert_score(candidate_id, job_id, float(final_score))
 
     return f"""
-    <h2>Saved! Match Score: {round(score * 100, 2)}%</h2>
+    <h2>Saved! Match Score: {round(final_score * 100, 2)}%</h2>
     <h3>Predicted Category: {predicted}</h3>
     """
-
 
 @app.route('/rankings/<int:job_id>')
 def rankings(job_id):
@@ -169,6 +174,93 @@ def rankings(job_id):
         {rows_html}
     </table>
     """
-    
+
+from utils.db_manager import (
+    get_job, get_ranked_candidates_for_job,
+    get_category_distribution, get_skill_distribution, get_all_candidates
+)
+
+@app.route('/dashboard/<int:job_id>')
+def dashboard(job_id):
+    job_record = get_job(job_id)
+    if job_record is None:
+        return "Job not found", 404
+
+    compute_scores_for_job(job_id)
+
+    ranked_candidates = get_ranked_candidates_for_job(job_id)
+    category_data = get_category_distribution()
+    skill_data = get_skill_distribution()
+    all_candidates = get_all_candidates()
+
+    category_labels = [row[0] for row in category_data]
+    category_counts = [row[1] for row in category_data]
+    skill_labels = list(skill_data.keys())
+    skill_counts = list(skill_data.values())
+
+    return render_template(
+        'dashboard.html',
+        job=job_record,
+        ranked_candidates=ranked_candidates,
+        total_candidates=len(all_candidates),
+        category_labels=category_labels,
+        category_counts=category_counts,
+        skill_labels=skill_labels,
+        skill_counts=skill_counts
+    )
+
+
+@app.route('/')
+def home():
+    jobs = get_all_jobs()
+    return render_template('home.html', jobs=jobs)
+
+
+@app.route('/api/upload_resume', methods=['POST'])
+def api_upload_resume():
+    file = request.files.get('resume')
+    if not file:
+        return jsonify({"success": False, "message": "No file was uploaded."}), 400
+
+    file_path = app.config['UPLOAD_FOLDER'] + '/' + file.filename
+    file.save(file_path)
+
+    extracted_text = extract_text_from_pdf(file_path)
+    cleaned = clean_text(extracted_text)
+
+    if not cleaned:
+        return jsonify({"success": False, "message": "Could not read text from this file."}), 400
+
+    skills = get_candidate_skills(cleaned)
+    predicted = predict_category(cleaned, model, vectorizer)
+
+    candidate_id = insert_candidate(file.filename, file_path, cleaned, predicted, skills)
+
+    return jsonify({
+        "success": True,
+        "candidate_id": candidate_id,
+        "predicted_category": predicted,
+        "detected_skills": skills
+    })
+
+
+@app.route('/api/submit_jd', methods=['POST'])
+def api_submit_jd():
+    title = request.form.get('job_title', '').strip()
+    text = request.form.get('job_description', '').strip()
+
+    if not title or not text:
+        return jsonify({"success": False, "message": "Job title and description are both required."}), 400
+
+    job_data = process_job_description(text, title=title)
+    job_id = insert_job(job_data['title'], job_data['cleaned_text'], job_data['required_skills'])
+
+    return jsonify({
+        "success": True,
+        "job_id": job_id,
+        "title": title,
+        "required_skills": job_data['required_skills']
+    })
+
 if __name__ == '__main__':
     app.run(debug=True)

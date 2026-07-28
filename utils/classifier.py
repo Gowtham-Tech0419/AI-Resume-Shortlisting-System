@@ -5,11 +5,44 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+from sklearn.svm import LinearSVC
 
+import re
+
+PROTECTED_TERMS = {
+    'c++': 'cplusplus',
+    'c#': 'csharp',
+    'f#': 'fsharp',
+    'node.js': 'nodejs',
+    'react.js': 'reactjs',
+    'vue.js': 'vuejs',
+    'next.js': 'nextjs',
+    'asp.net core': 'aspnet core',
+    '.net core': 'dotnet core',
+    'objective-c': 'objectivec',
+    'a/b testing': 'a b testing',
+    'ci/cd': 'ci cd',
+    'tcp/ip': 'tcp ip',
+    'ui/ux': 'ui ux'
+}
+
+def preprocess_text(text):
+    """Normalize text consistently across all dataset rows."""
+    text = str(text).lower()
+    for term, replacement in PROTECTED_TERMS.items():
+        text = text.replace(term, replacement)
+    # Remove remaining special characters cleanly
+    text = re.sub(r'[^a-zA-Z0-9\s]', ' ', text)
+    return ' '.join(text.split())
 
 def load_dataset(csv_path='data/resume_dataset.csv'):
     df = pd.read_csv(csv_path)
+    df['resume_text'] = df['resume_text'].apply(preprocess_text)
+    # Drop any duplicate rows created during merging
+    df = df.drop_duplicates(subset=['resume_text']).reset_index(drop=True)
+    print(f"Total clean samples loaded: {len(df)}")
     return df
+
 
 
 def split_dataset(df, test_size=0.25, random_state=42):
@@ -35,10 +68,14 @@ def train_naive_bayes(X_train_vectors, y_train):
 
 
 def train_logistic_regression(X_train_vectors, y_train):
-    model = LogisticRegression(max_iter=1000)
+    model = LogisticRegression(C=10.0, max_iter=1000, random_state=42)
     model.fit(X_train_vectors, y_train)
     return model
 
+def train_linear_svc(X_train_vectors, y_train):
+    model = LinearSVC(C=1.0, random_state=42,max_iter=2000,class_weight='balanced')
+    model.fit(X_train_vectors, y_train)
+    return model
 
 def evaluate_model(model, X_test_vectors, y_test):
     predictions = model.predict(X_test_vectors)

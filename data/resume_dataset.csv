@@ -11,6 +11,21 @@ resume_text,category
 "applied statistics and python to build churn prediction models for business",Data Scientist
 "worked on computer vision projects using convolutional neural networks and opencv",Data Scientist
 "experience with a b testing hypothesis testing and predictive analytics using python",Data Scientist
+"ai engineer building rag pipelines with langchain llamaindex and vector databases",AI Engineer
+"developed generative ai applications using open ai api fine tuning and transformers",AI Engineer
+"applied lora and qlora for prompt engineering and custom llm deployments using vllm",AI Engineer
+"ai researcher implementing agentic workflows vector search and chromadb embeddings",AI Engineer
+"built semantic search systems using hugging face transformers and qdrant",AI Engineer
+"python developer building backend apis with django fastapi and postgresql",Python Developer
+"experienced python software engineer with object oriented programming and pytest",Python Developer
+"built web scrapers automation scripts and rest services using python and flask",Python Developer
+"python engineer writing clean code data manipulation scripts and celery task queues",Python Developer
+"developed microservices in python using pydantic sqlalchemy and docker",Python Developer
+"java developer specializing in core java spring boot hibernate and microservices",Java Developer
+"enterprise java engineer proficient in java 17 spring mvc junit and maven",Java Developer
+"backend developer building multithreaded java applications rest apis and MySQL integration",Java Developer
+"java software engineer experienced in kafka event driven architecture and jpa",Java Developer
+"java application developer working with spring cloud security and oracle databases",Java Developer
 "java spring boot backend developer rest api microservices",Software Engineer
 "software engineer c++ system design object oriented programming",Software Engineer
 "full stack developer javascript react node express",Software Engineer
@@ -47,3 +62,103 @@ resume_text,category
 "data analyst experienced in writing complex sql queries for reporting",Data Analyst
 "analyzed operational metrics and built visualizations to support decision making",Data Analyst
 "worked with stakeholders to define reporting requirements and build sql dashboards",Data Analyst
+"devops engineer managing aws cloud infrastructure using terraform and ansible",DevOps Engineer
+"built automated ci cd pipelines using jenkins gitlab ci and docker containers",DevOps Engineer
+"site reliability engineer experienced in kubernetes helm and prometheus monitoring",DevOps Engineer
+"cloud architect designing azure infrastructure and cloudformation templates",DevOps Engineer
+"linux systems administrator proficient in shell scripting bash and nginx configuration",DevOps Engineer
+"managed dockerized microservices deployment on AWS EKS and grafana dashboards",DevOps Engineer
+"mobile developer creating native android applications using kotlin and java",Mobile Developer
+"ios engineer skilled in swift swiftui and xcode application development",Mobile Developer
+"cross platform mobile developer proficient in flutter dart and firebase integration",Mobile Developer
+"react native developer building mobile apps with state management and REST APIs",Mobile Developer
+"ui ux designer skilled in figma wireframing prototyping and user research",UI UX Designer
+"product designer creating interactive designs using adobe xd sketch and invision",UI UX Designer
+"user experience researcher conducting usability testing and interaction design in canva",UI UX Designer
+"frontend ui designer crafting design systems and responsive web layouts in figma",UI UX Designer
+"qa automation engineer building test frameworks with selenium java and pytest",QA Engineer
+"software tester skilled in manual testing api testing with postman and junit",QA Engineer
+"sdet experienced in cypress automation load testing using jmeter and appium",QA Engineer
+"quality assurance specialist executing test driven development unit testing and integration testing",QA Engineer
+"cybersecurity analyst experienced in penetration testing network security and owasp",Cybersecurity Specialist
+"ethical hacker skilled in vulnerability assessment burp suite nmap and wireshark",Cybersecurity Specialist
+"security engineer implementing firewalls cryptography siem and iso 27001 compliance",Cybersecurity Specialist
+"identity and access management specialist configuring network firewalls and threat monitoring",Cybersecurity Specialist
+"agile project manager leading scrum teams using jira confluence and kanban",Project Manager
+"scrum master facilitating daily standups sprint planning and tracking in trello",Project Manager
+"technical project manager driving software delivery using asana and monday.com",Project Manager
+"pmp certified project manager handling stakeholder management budget and risk assessment",Project Manager
+"financial analyst proficient in financial modeling forecasting budgeting and excel",Financial Analyst
+"accountant managing accounts payable accounts receivable quickbooks and tax compliance",Financial Analyst
+"sap financial consultant experienced in sap erp auditing and taxation",Financial Analyst
+"business erp consultant implementing netsuite tally gst and financial reporting",Financial Analyst
+"network administrator managing tcp ip dns dhcp active directory and vpn routing",Network Engineer
+"systems administrator skilled in vmware virtualization active directory and citrix",Network Engineer
+"network engineer with ccna certification load balancing and router configuration",Network Engineer
+"software engineer focused on object oriented programming system architecture and design patterns",Software Engineer
+"experienced software developer building scalable desktop and web applications with clean code",Software Engineer
+"software engineer with expertise in data structures algorithm optimization and code refactoring",Software Engineer
+"full lifecycle software developer skilled in unit testing system integration and agile development",Software Engineer
+"software engineer designing distributed systems microservices architecture and high availability tools",Software Engineer
+"developed robust software applications using enterprise design patterns and object oriented principles",Software Engineer
+"software engineer experienced in multi threading memory management and low level optimization",Software Engineer
+"built modular software applications with test driven development and peer code reviews",Software Engineer
+"software engineer driving software development lifecycle requirements analysis and system design",Software Engineer
+"backend software engineer implementing rest apis database schema design and core business logic",Software Engineer
+"python developer building backend web applications using django object relational mapping and postgresql",Python Developer
+"experienced python engineer writing asynchronous microservices with fastapi pydantic and asyncio",Python Developer
+"developed web automation scripts web scrapers and RESTful services using python and flask",Python Developer
+"python developer proficient in clean code celery task queues sqlalchemy and pytest automation",Python Developer
+"backend python developer with experience in django REST framework microservices and redis caching",Python Developer
+"python software engineer writing scalable code data processing pipelines and API integrations",Python Developer
+"built automated web scrapers and serverless python functions on cloud platforms",Python Developer
+"python developer skilled in writing modular scripts debugging object oriented python and unit tests",Python Developer
+"developed high performance python apis integrating with relational databases and message brokers",Python Developer
+"python backend engineer specializing in web framework architecture database migrations and ORM",Python Developer
+"devops engineer managing aws cloud infrastructure using terraform modules and ansible playbooks",DevOps Engineer
+"built automated continuous integration and continuous deployment pipelines using jenkins and gitlab ci",DevOps Engineer
+"site reliability engineer experienced in kubernetes cluster deployment helm charts and prometheus monitoring",DevOps Engineer
+"cloud infrastructure engineer managing azure resources cloudformation templates and infrastructure as code",DevOps Engineer
+"devops specialist configuring docker containerization kubernetes orchestration and grafana dashboards",DevOps Engineer
+"linux systems administrator proficient in bash shell scripting nginx load balancing and system security",DevOps Engineer
+"devops engineer automating infrastructure deployment site reliability and disaster recovery planning",DevOps Engineer
+"implemented continuous integration pipelines automated testing and container deployment using docker",DevOps Engineer
+"managed cloud infrastructure monitoring alert manager log aggregation with ELK stack and grafana",DevOps Engineer
+"devops architect automating multi region cloud deployments terraform state management and security compliance",DevOps Engineer
+"java developer building enterprise microservices using spring boot hibernate and maven",Java Developer
+"core java software engineer experienced in multithreading concurrency rest apis and mysql",Java Developer
+"java backend engineer proficient in spring mvc junit testing kafka messaging and jpa",Java Developer
+"senior java developer optimizing backend systems JVM tuning and cloud microservices",Java Developer
+"java application developer implementing security modules spring security and oracle db",Java Developer
+"mobile app developer building native android applications using kotlin java and android studio",Mobile Developer
+"ios mobile engineer proficient in swift swiftui xcode and core data application architecture",Mobile Developer
+"cross platform mobile developer crafting apps with flutter dart state management and firebase",Mobile Developer
+"react native mobile developer creating cross platform mobile applications with rest apis",Mobile Developer
+"mobile developer specializing in mobile app UI performance tuning offline storage and pushes",Mobile Developer
+"qa automation engineer designing test frameworks using selenium java pytest and testng",QA Engineer
+"software test engineer executing manual testing api testing with postman and regression tests",QA Engineer
+"sdet specialist skilled in cypress automation load testing using jmeter and appium mobile testing",QA Engineer
+"quality assurance engineer focusing on test driven development continuous integration testing and bug tracking",QA Engineer
+"qa tester creating automated test suites writing test cases and managing defect lifecycle in jira",QA Engineer
+"agile project manager leading software development teams sprint planning scrum and kanban",Project Manager
+"pmp certified project manager handling scope management stakeholder communication and budget tracking",Project Manager
+"scrum master facilitating daily standups removing blockers and managing project delivery in jira",Project Manager
+"technical project manager driving cross functional engineering projects using asana and confluence",Project Manager
+"project manager overseeing software delivery resource allocation risk mitigation and timelines",Project Manager
+"financial analyst skilled in financial modeling forecasting corporate budgeting and excel pivot tables",Financial Analyst
+"certified accountant handling accounts payable accounts receivable quickbooks and tax auditing",Financial Analyst
+"financial consultant preparing quarterly financial statements valuation models and sap erp reports",Financial Analyst
+"finance analyst analyzing operational budgets cash flow forecasting and risk assessment",Financial Analyst
+"network engineer configuring cisco routers switches vlan routing and firewall rules",Network Engineer
+"network infrastructure administrator managing tcp ip routing protocols subnets and vpn connections",Network Engineer
+"software engineer focused on computer science fundamentals object oriented design and algorithm efficiency",Software Engineer
+"full stack software engineer designing scalable system architecture clean code and software design patterns",Software Engineer
+"backend software engineer building core business logic system integration and software development lifecycle",Software Engineer
+"ui ux designer crafting user interfaces wireframes visual design systems and user experience flows in figma",UI UX Designer
+"user experience designer conducting usability testing interaction design user research and prototyping",UI UX Designer
+"product designer designing mobile and web application interfaces user journeys and wireframes",UI UX Designer
+"software engineer specializing in object oriented programming algorithms and system design patterns",Software Engineer
+"backend software developer focused on data structures memory management and enterprise code refactoring",Software Engineer
+"software engineer driving core software development lifecycle unit testing and system architecture",Software Engineer
+"full lifecycle software developer implementing clean code modular architecture and peer code reviews",Software Engineer
+"software engineer designing distributed systems multi threading and high availability applications",Software Engineer
