@@ -1,249 +1,439 @@
 # AI Resume Shortlisting System
 
-An end-to-end AI-powered recruitment assistant that parses resumes, extracts skills, matches candidates against job descriptions, predicts candidate categories using machine learning, and presents everything through a recruiter-facing dashboard.
+An AI-powered recruitment application that helps HR teams screen resumes, identify candidate skills, predict job categories, and rank applicants against job descriptions.
 
-Built from scratch to demonstrate a complete pipeline spanning **backend engineering, NLP, classical machine learning, relational database design, and full-stack web development** — not a single-notebook demo, but a working, testable application.
-
----
+Built using Python, Flask, Natural Language Processing (NLP), Machine Learning, and SQLite, this project demonstrates an end-to-end workflow from resume upload to recruiter-friendly candidate analytics.
 
 ## Table of Contents
 
-- [Problem Statement](#problem-statement)
-- [Live Feature Overview](#live-feature-overview)
-- [System Architecture](#system-architecture)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [How It Works — Pipeline Walkthrough](#how-it-works--pipeline-walkthrough)
-- [Setup & Installation](#setup--installation)
-- [Usage](#usage)
-- [Machine Learning Component](#machine-learning-component)
-- [Database Schema](#database-schema)
-- [Design Decisions Worth Knowing](#design-decisions-worth-knowing)
-- [Known Limitations](#known-limitations)
-- [Future Improvements](#future-improvements)
-- [What I Learned](#what-i-learned)
+* [Overview](#overview)
+* [Key Features](#key-features)
+* [System Architecture](#system-architecture)
+* [Technology Stack](#technology-stack)
+* [How It Works](#how-it-works)
+* [Installation and Setup](#installation-and-setup)
+* [How to Use](#how-to-use)
+* [Machine Learning Model](#machine-learning-model)
+* [Database Design](#database-design)
+* [Important Design Decisions](#important-design-decisions)
+* [Limitations](#limitations)
+* [Future Improvements](#future-improvements)
+* [Learning Outcomes](#learning-outcomes)
+* [Author](#author)
 
----
+## Overview
 
-## Problem Statement
+Recruiters often receive a large number of resumes for a single job opening. Manually reviewing every application can be time-consuming.
 
-Large companies receive thousands of resumes per job opening. HR teams cannot manually review every application. This system automates the early screening funnel:
+The AI Resume Shortlisting System simplifies the initial screening process by extracting information from PDF resumes, identifying relevant skills, predicting candidate job categories, and comparing candidates with job requirements.
 
-1. Reads and understands resumes (PDF text extraction + NLP)
-2. Extracts candidate skills against a curated skill taxonomy
-3. Predicts a likely job category using a trained ML classifier
-4. Matches candidates against job descriptions on **skill coverage**, with content similarity as a secondary relevance signal
-5. Presents ranked, filterable results with visual analytics on a recruiter dashboard
+The application provides a web-based interface where candidates can upload resumes and recruiters can create job descriptions, review ranked applicants, and explore recruitment analytics.
 
----
+**The system uses two separate matching metrics:**
 
-## Live Feature Overview
+* **Skill Match:** Measures the percentage of required job skills identified in a candidate's resume.
+* **Content Relevance:** Measures textual similarity between the resume and job description using TF-IDF and cosine similarity.
 
-**For Candidates**
-- Upload a PDF resume through a simple web form
-- Immediate feedback: predicted job category and detected skills
+Skill Match is the primary ranking metric, while Content Relevance is used to break ties.
 
-**For HR**
-- Paste and save a job description; required skills are extracted automatically
-- Select any posted job from a dropdown — no need to know internal IDs
-- View a ranked candidate dashboard per job, with:
-  - Skill-match percentage per candidate (primary ranking metric)
-  - Content-relevance percentage (secondary tie-breaking signal)
-  - Predicted category per candidate
-  - Pie chart: predicted category distribution
-  - Bar chart: skill distribution across all applicants
-  - Live client-side filtering by category
+## Key Features
 
-All three workflows — candidate upload, job posting, dashboard access — live on a **single home page**, with no full-page reloads for form submissions (implemented via the Fetch API).
+### Candidate Features
 
----
+* Upload resumes in PDF format.
+* Extract resume text automatically.
+* Identify skills using a predefined skill database.
+* Predict a likely job category using a trained machine learning model.
+* View detected skills and the predicted category after processing.
+
+### Recruiter Features
+
+* Create and save job descriptions.
+* Automatically extract required skills from job descriptions.
+* Select a job from a dropdown menu.
+* View candidates ranked by skill match.
+* Compare skill match and content relevance scores.
+* Filter candidates by predicted job category.
+* Explore candidate category and skill distribution charts.
+* Export candidate, job, and scoring data to Excel.
+
+### Technical Features
+
+* PDF text extraction using PyMuPDF.
+* Text preprocessing using NLTK and regular expressions.
+* Skill identification using word-boundary matching.
+* Text vectorization and similarity calculation using TF-IDF and cosine similarity.
+* Supervised job-category classification using scikit-learn.
+* Persistent storage using SQLite.
+* Asynchronous-feeling form interactions using the JavaScript Fetch API without full-page reloads for supported submissions.
 
 ## System Architecture
 
-┌─────────────────────┐
-                │     Home Page (UI)   │
-                │  Upload | Post JD |   │
-                │  View Dashboard       │
-                └──────────┬────────────┘
-                           │ Fetch API (JSON)
-                           ▼
-                ┌─────────────────────┐
-                │     Flask Routes      │
-                └──────────┬────────────┘
-                           │
-    ┌──────────────────────┼───────────────────────┐
-    ▼                      ▼                        ▼
-    ┌───────────────┐ ┌───────────────────┐ ┌────────────────────┐
-│ Resume Parser │ │ NLP Preprocessing │ │ Skill Extractor │
-│ (PyMuPDF) │──▶│ (NLTK: clean, │──▶│ (Regex + JSON │
-│ │ │ tokenize, lemmatize)│ │ skill database) │
-└───────────────┘ └───────────────────┘ └──────────┬─────────┘
-│
-┌─────────────────────────────────────┘
-▼
-┌───────────────────────┐ ┌──────────────────────┐
-│ TF-IDF Vectorization │ │ ML Classifier │
-│ + Cosine Similarity │ │ (Naive Bayes / │
-│ (content relevance) │ │ Logistic Regression) │
-└───────────┬────────────┘ └──────────┬────────────┘
-│ │
-└───────────────┬──────────────┘
-▼
-┌───────────────────────┐
-│ SQLite Database │
-│ candidates | jobs | │
-│ scores │
-└───────────┬────────────┘
-▼
-┌───────────────────────┐
-│ Recruiter Dashboard │
-│ (Bootstrap + Chart.js) │
-└───────────────────────┘
----
+The following diagram shows how information flows through the application, from resume upload and job description entry to candidate ranking and dashboard visualization.
 
-## Tech Stack
+```mermaid
+flowchart TD
+    A["Candidate Uploads Resume"] --> C["Flask Backend"]
+    B["Recruiter Submits Job Description"] --> C
 
-| Layer | Technology |
-|---|---|
-| Backend | Python, Flask |
-| PDF Parsing | PyMuPDF (fitz) |
-| NLP | NLTK (tokenization, stopwords, lemmatization), Regex |
-| Machine Learning | scikit-learn (TF-IDF, Naive Bayes, Logistic Regression) |
-| Database | SQLite |
-| Frontend | HTML, CSS, JavaScript (Fetch API), Bootstrap 5, Chart.js |
-| Data Export | pandas, openpyxl |
+    C --> D["PDF Text Extraction"]
+    D --> E["NLP Preprocessing"]
+    E --> F["Skill Extraction"]
 
----
----
+    E --> G["TF-IDF Vectorization"]
+    G --> H["Job Category Classifier"]
 
-## How It Works — Pipeline Walkthrough
+    F --> I["SQLite Database"]
+    H --> I
+    C --> I
 
-**1. Resume Upload → Text Extraction**
-A candidate uploads a PDF via the home page. PyMuPDF extracts raw text page by page.
+    I --> J["Candidate and Job Data"]
+    J --> K["Candidate Matching Engine"]
 
-**2. NLP Preprocessing**
-Raw text is lowercased, symbol-bearing terms (`C++`, `Node.js`, `.NET`) are protected from corruption, punctuation is stripped, and the result is tokenized, stopword-filtered, and lemmatized.
+    K --> L["Skill Match Score"]
+    K --> M["Content Relevance Score"]
 
-**3. Skill Extraction**
-Cleaned text is scanned against a 14-category, 150+ term skill taxonomy using word-boundary regex matching — preventing false positives like matching "java" inside "javascript."
+    L --> N["Ranked Candidate Results"]
+    M --> N
 
-**4. Category Prediction**
-The cleaned text is vectorized and passed through a trained Naive Bayes / Logistic Regression classifier, predicting a likely job category (e.g., Data Scientist, Software Engineer, HR, Data Analyst).
+    N --> O["Recruiter Dashboard"]
+    O --> P["Charts, Filters and Candidate Details"]
+    O --> Q["Excel Export"]
+```
 
-**5. Job Description Processing**
-HR pastes a job description through the same cleaning and skill-extraction pipeline, guaranteeing consistent preprocessing on both sides of any future comparison.
+The architecture separates the main responsibilities of the application:
 
-**6. Matching & Scoring**
-When HR opens a dashboard for a job, every candidate without an existing score is evaluated using two independent signals:
-- **Skill Match** (primary, headline score) — the proportion of required skills the candidate actually has
-- **Content Relevance** (secondary, tie-breaking score) — TF-IDF cosine similarity between full resume text and job description text
+* **Flask Backend:** Handles user requests, resume uploads, job submissions, and application workflows.
+* **NLP Pipeline:** Cleans text and extracts relevant skills.
+* **Machine Learning Model:** Predicts a likely job category from resume text.
+* **Matching Engine:** Calculates skill coverage and content similarity.
+* **SQLite Database:** Stores candidate information, job descriptions, and matching scores.
+* **Recruiter Dashboard:** Displays ranked candidates and recruitment analytics.
 
-**7. Dashboard Rendering**
-Candidates are ranked by skill match (ties broken by content relevance), with category and skill distribution charts rendered via Chart.js, and live client-side filtering.
+## Technology Stack
 
----
+| Component                   | Technologies                                 |
+| --------------------------- | -------------------------------------------- |
+| Programming Language        | Python                                       |
+| Backend Framework           | Flask                                        |
+| PDF Processing              | PyMuPDF                                      |
+| Natural Language Processing | NLTK, Regular Expressions                    |
+| Machine Learning            | scikit-learn                                 |
+| Text Representation         | TF-IDF                                       |
+| Similarity Calculation      | Cosine Similarity                            |
+| Classification Algorithms   | Multinomial Naive Bayes, Logistic Regression |
+| Database                    | SQLite                                       |
+| Frontend                    | HTML, CSS, JavaScript                        |
+| UI Framework                | Bootstrap 5                                  |
+| Data Visualization          | Chart.js                                     |
+| Excel Export                | pandas, openpyxl                             |
 
-## Setup & Installation
+## How It Works
+
+### 1. Resume Upload and Text Extraction
+
+A candidate uploads a PDF resume through the web interface. PyMuPDF extracts text from the document so it can be processed by the application.
+
+### 2. Text Preprocessing
+
+The extracted text is cleaned and prepared for analysis using NLTK and regular expressions.
+
+The preprocessing pipeline includes lowercasing, tokenization, stopword removal, and lemmatization. Special handling protects technology names such as `C++`, `Node.js`, and `.NET` from being corrupted during cleaning.
+
+### 3. Skill Extraction
+
+The system identifies candidate skills by matching the processed resume against a predefined skill taxonomy containing more than 150 terms across 14 categories.
+
+Word-boundary matching helps prevent incorrect matches, such as detecting `Java` inside `JavaScript`.
+
+### 4. Job Category Prediction
+
+The cleaned resume text is converted into TF-IDF features and passed to a trained classification model.
+
+The model predicts a likely category, such as Data Analyst, Data Scientist, Software Engineer, or HR, based on the categories available in the training dataset.
+
+### 5. Job Description Processing
+
+Recruiters enter a job title and description through the web interface.
+
+The system processes the description using the same text-cleaning and skill-extraction pipeline used for resumes, helping maintain consistency during comparison.
+
+### 6. Candidate Matching and Ranking
+
+When a recruiter opens a dashboard for a selected job, the application evaluates candidates using two metrics.
+
+**Skill Match**
+
+Measures how many required skills are present in the candidate's detected skill set.
+
+$$
+\text{Skill Match (\%)} =
+\frac{\text{Matched Required Skills}}
+{\text{Total Required Skills}} \times 100
+$$
+
+For example, if a job requires 8 skills and a candidate has 6 of them, the skill match is 75%.
+
+**Content Relevance**
+
+Uses TF-IDF vectors and cosine similarity to measure textual similarity between the resume and job description.
+
+The two scores are displayed separately. Candidates are ranked primarily by Skill Match, with Content Relevance used to break ties.
+
+### 7. Recruiter Dashboard
+
+The dashboard presents the matching results in a recruiter-friendly format, including:
+
+* Ranked candidate lists.
+* Skill match and content relevance percentages.
+* Predicted job categories.
+* Candidate category distribution charts.
+* Skill distribution charts.
+* Client-side filtering by category.
+
+## Installation and Setup
+
+### Prerequisites
+
+Install the following before running the application:
+
+* Python
+* Git
+* pip, the Python package installer
+
+### Step 1: Clone the Repository
+
+Replace the repository URL below with your actual GitHub repository URL.
 
 ```bash
-git clone <your-repo-url>
+git clone <your-repository-url>
 cd resume_shortlisting_system
+```
 
+### Step 2: Install Dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
+### Step 3: Download NLTK Resources
+
+```bash
 python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords'); nltk.download('wordnet'); nltk.download('omw-1.4')"
+```
 
+If your installed NLTK version requires `punkt_tab`, download that resource as well.
+
+### Step 4: Initialize the Database
+
+```bash
 python -c "from utils.db_manager import initialize_database; initialize_database()"
+```
 
+Run this command if your project uses the `utils.db_manager.initialize_database` function shown above.
+
+### Step 5: Train the Machine Learning Model
+
+```bash
 python train_model.py
+```
 
+This step trains the classifier using the project's labeled training dataset. Run it whenever the model needs to be regenerated.
+
+### Step 6: Start the Application
+
+```bash
 python app.py
 ```
 
-Visit `http://127.0.0.1:5000/`
+Open the following URL in your browser:
 
----
+http://127.0.0.1:5000/
 
-## Usage
+Make sure the file paths and commands match your actual repository structure.
 
-1. **As a candidate**: open the home page, upload a PDF resume, view your predicted category and detected skills instantly.
-2. **As HR**: switch to the "Post a Job" tab, paste a job description and title, save it.
-3. **View results**: switch to the "View Dashboard" tab, select the job from the dropdown (auto-populated, including any job you just posted), click "View Dashboard" to see ranked candidates and analytics.
+## How to Use
 
-To export all data for offline review:
+**For candidates**
+
+1. Open the application home page.
+2. Upload a PDF resume.
+3. Review the detected skills and predicted job category.
+
+**For recruiters**
+
+1. Open the Post a Job section.
+2. Enter a job title and description.
+3. Save the job.
+4. Navigate to the View Dashboard section.
+5. Select the job from the dropdown.
+6. Review the ranked candidates, scores, charts, and category filters.
+
+### Exporting Data
+
+To export candidate, job, and matching data into an Excel workbook, run:
+
 ```bash
 python export_to_excel.py
 ```
-Produces a timestamped `.xlsx` file with Candidates, Jobs, and Scores as separate sheets.
 
----
+The script generates an Excel file containing separate worksheets for Candidates, Jobs, and Scores, provided the export functionality is configured as described.
 
-## Machine Learning Component
+## Machine Learning Model
 
-This is the one genuinely trained, supervised ML piece of the system (everything else — skill extraction, TF-IDF, cosine similarity — is deterministic NLP/statistics, not machine learning).
+The application uses supervised machine learning to predict candidate job categories from resume text.
 
-- **Algorithms compared**: Multinomial Naive Bayes and Logistic Regression
-- **Features**: TF-IDF vectors of cleaned resume text
-- **Evaluation**: stratified train/test split, accuracy, confusion matrix, classification report
-- **Data leakage prevention**: the vectorizer is fit exclusively on training data; test data is only ever `.transform()`-ed, never `.fit()`-ed
+### Algorithms
 
-**Honest note on results**: with a training dataset using clearly separated, category-typical vocabulary across 48 labeled examples (12 per category), both models reach 100% test accuracy. This reflects the dataset's clean class separation rather than proof the model would generalize equally well to messier, real-world resumes with overlapping terminology (e.g., a Data Analyst resume mentioning "machine learning"). A production version would require a much larger, more ambiguous, real-world-sourced training set.
+* Multinomial Naive Bayes
+* Logistic Regression
 
----
+### Training Pipeline
 
-## Database Schema
+1. Load the labeled resume dataset.
+2. Preprocess resume text.
+3. Split the dataset into training and testing subsets using stratified sampling.
+4. Fit the TF-IDF vectorizer on the training data.
+5. Train and evaluate the classification models.
+6. Compare evaluation metrics and inspect the classification report and confusion matrix.
+
+### Reported Results
+
+The current experimental dataset contains 48 labeled examples across four categories, with 12 examples per category. Both models achieved 100% test accuracy on the described split.
+
+**Important:** This result reflects performance on a small, clearly separated dataset. It does not establish that the models will achieve the same accuracy on real-world resumes, where job categories and technical skills often overlap.
+
+A reliable production evaluation would require a larger, more diverse dataset and additional validation.
+
+### Matching Is Separate from Classification
+
+The machine learning classifier predicts a job category. The matching engine separately calculates Skill Match and Content Relevance for a selected job.
+
+This separation makes the results easier to interpret and prevents a category prediction from being confused with a candidate's suitability for a specific role.
+
+## Database Design
+
+The application uses SQLite to persist candidate records, job descriptions, and matching scores.
+
+### Main Tables
+
+**Candidates**
+
+Stores candidate details, resume file paths, processed text, predicted categories, and detected skills.
+
+**Jobs**
+
+Stores job titles, processed job descriptions, and required skills.
+
+**Scores**
+
+Stores the calculated matching results associated with each candidate and job.
+
+### Simplified Schema
 
 ```sql
-candidates (id, name, resume_path, cleaned_text, predicted_category, detected_skills)
-jobs (id, title, cleaned_text, required_skills)
-scores (id, candidate_id [FK], job_id [FK], match_score, content_score)
+candidates (
+    id,
+    name,
+    resume_path,
+    cleaned_text,
+    predicted_category,
+    detected_skills
+);
+
+jobs (
+    id,
+    title,
+    cleaned_text,
+    required_skills
+);
+
+scores (
+    id,
+    candidate_id,
+    job_id,
+    match_score,
+    content_score
+);
 ```
 
-- Foreign key constraints enforced via `PRAGMA foreign_keys = ON`
-- All queries use parameterized statements (`?` placeholders) — no string-built SQL anywhere, preventing SQL injection
-- `detected_skills` / `required_skills` are stored as JSON-encoded strings (SQLite has no native array type) and parsed back into Python lists on read
+Candidate and job references connect each score to the corresponding records.
 
----
+The application uses parameterized SQL queries to reduce SQL injection risks. Skill lists are stored as JSON-encoded strings and converted back into Python lists when retrieved.
 
-## Design Decisions Worth Knowing
+## Important Design Decisions
 
-**Why skill match, not a single blended score, drives ranking.**
-An early version blended cosine similarity and skill overlap into one weighted average. Testing revealed this let weak textual similarity mask a perfect skill match — a candidate with 100% of required skills could still show well under 100% simply because their resume's overall prose didn't closely resemble a short, skill-only job description. Skill match and content relevance are now reported as two separate, clearly labeled metrics, with skill match as the primary sort key.
+### Separate Skill Match from Content Relevance
 
-**Why symbol-bearing skills (C++, Node.js, .NET) get special handling.**
-Naive punctuation stripping merges adjacent tokens (`"C++,Java"` → `"cjava"`), silently destroying valid skills. A `PROTECTED_TERMS` dictionary converts known symbol-bearing terms into safe placeholder tokens *before* general text cleaning runs, with a corresponding `DISPLAY_NAMES` mapping to show the correct formatted name back to the user.
+Skill coverage is a direct measure of how many listed job requirements a candidate appears to satisfy. Overall textual similarity is useful but can be affected by resume wording and document length.
 
-**Why job descriptions reuse the exact same cleaning/skill-extraction functions as resumes.**
-Consistent preprocessing is required for any valid comparison between two documents — if one side were cleaned differently, equivalent terms could fail to match.
+Reporting these metrics separately makes candidate comparisons more transparent.
 
-**Why the database uses lazy, on-demand scoring rather than scoring at upload time.**
-Candidates can upload resumes before a relevant job even exists. Scores are computed the first time HR views a dashboard for a given job, checking for and skipping any candidate/job pairs already scored, avoiding redundant computation on repeat visits.
+### Protect Technology Names During Text Cleaning
 
----
+Standard punctuation removal can corrupt terms such as `C++`, `Node.js`, and `.NET`. The preprocessing pipeline protects these terms before applying general text-cleaning operations.
 
-## Known Limitations
+### Use Consistent Preprocessing
 
-- **Skill detection is exact-match only** — it cannot infer implied skills or recognize unlisted synonyms/abbreviations not already in the skill database.
-- **Short/ambiguous skill names** (e.g., "Go," "R") risk false positives against common English words; the taxonomy favors more specific variants (`golang`, `rprogramming`) where possible, but this isn't a complete solution.
-- **ML training data is small (48 examples)** and uses cleanly separated category vocabulary — real-world accuracy would likely be lower on ambiguous, overlapping resumes.
-- **No authentication** — dashboard and job-posting routes are open to anyone with the URL.
-- **SQLite is single-file, single-writer** — appropriate for a portfolio project, not for concurrent multi-user production traffic.
-- **Client-side table filtering** doesn't scale gracefully to very large candidate counts.
-- **A new TF-IDF vectorizer is fit per scoring batch** rather than reused from a large historical corpus, meaning IDF weights are relative only to the current comparison set.
+Resumes and job descriptions pass through the same cleaning and skill-extraction logic. This reduces inconsistencies when comparing their contents.
 
----
+### Calculate Scores on Demand
+
+Candidates can upload resumes before a recruiter creates a job. The system calculates scores when a dashboard is opened and can reuse previously stored scores for the same candidate-job pairs.
+
+This avoids unnecessary recalculation on repeat visits.
+
+## Limitations
+
+* Skill extraction depends on a predefined taxonomy and may miss synonyms or skills that are implied rather than explicitly mentioned.
+* Short skill names can create false positives in some contexts.
+* The machine learning dataset is small and may not represent real-world resume diversity.
+* The application does not include authentication or role-based access control in the described implementation.
+* SQLite is appropriate for local development and small demonstrations but may not suit high-concurrency production workloads.
+* Client-side filtering may become inefficient with very large candidate datasets.
+* TF-IDF similarity depends on the text and vocabulary of the documents being compared.
+* The system supports initial screening and should not be treated as an autonomous hiring decision-maker.
 
 ## Future Improvements
 
-- Replace exact-match skill extraction with embedding-based semantic matching for synonym/paraphrase detection
-- Move to a normalized `candidate_skills` junction table for direct SQL-level skill analytics
-- Add authentication and role-based access (candidate vs. HR)
-- Migrate from SQLite to PostgreSQL for concurrent production use
-- Expand training data significantly and adopt cross-validation over a single train/test split
-- Add required-vs-preferred skill distinction in job description parsing
+* Introduce semantic skill matching to recognize synonyms and related technical terms.
+* Expand and diversify the training dataset.
+* Use cross-validation and more robust model evaluation.
+* Add candidate and recruiter authentication with role-based access control.
+* Migrate to PostgreSQL for applications requiring greater concurrency.
+* Distinguish mandatory skills from preferred skills.
+* Improve resume parsing for different document layouts and formats.
+* Add pagination and server-side filtering for larger datasets.
+* Provide clearer explanations of why a candidate matched a job.
+* Add human-review workflows and fairness monitoring.
+
+## Learning Outcomes
+
+Developing this project provided practical experience in:
+
+* Building a complete Python web application using Flask.
+* Extracting text from PDF documents.
+* Applying NLP techniques to unstructured text.
+* Designing rule-based skill extraction with regular expressions.
+* Training and evaluating supervised classification models.
+* Using TF-IDF and cosine similarity for document comparison.
+* Designing relational database tables and SQL queries.
+* Integrating frontend forms with backend APIs using the Fetch API.
+* Visualizing recruitment analytics with Chart.js.
+* Identifying data leakage risks and understanding the limitations of small datasets.
+* Making engineering decisions based on observed application behavior.
+
+## Author
+
+**Gowtham G**
+
+Generative AI Engineer | Python Developer | Machine Learning
+
+* GitHub: [Gowtham-Tech0419](https://github.com/Gowtham-Tech0419)
+* LinkedIn: [Gowtham G](https://www.linkedin.com/in/here-gowtham-g/)
+* Portfolio: [gowthamgopalakrishnan.vercel.app](https://gowthamgopalakrishnan.vercel.app/)
 
 ---
 
-## What I Learned
+This project is intended for educational and portfolio purposes. Candidate rankings are based on extracted information and automated matching metrics and should support, not replace, human review.
 
-Building this project end-to-end — rather than following a single tutorial — surfaced real engineering problems that don't appear in toy examples: a punctuation-stripping regex silently destroying skill names, a stratified split failing on too few samples per class, a naive scoring blend producing a "wrong" 100%-skill-match result, and the concrete difference between deterministic NLP/statistics and genuine trained machine learning. Each of these became a documented design decision rather than a hidden bug — which is, I think, the actual point of building a portfolio project instead of copying one.
