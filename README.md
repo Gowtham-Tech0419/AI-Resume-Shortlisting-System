@@ -70,35 +70,65 @@ Skill Match is the primary ranking metric, while Content Relevance is used to br
 ## System Architecture
 
 The following diagram shows how information flows through the application, from resume upload and job description entry to candidate ranking and dashboard visualization.
+## System Architecture
 
-```mermaid
-flowchart TD
-    A["Candidate Uploads Resume"] --> C["Flask Backend"]
-    B["Recruiter Submits Job Description"] --> C
-
-    C --> D["PDF Text Extraction"]
-    D --> E["NLP Preprocessing"]
-    E --> F["Skill Extraction"]
-
-    E --> G["TF-IDF Vectorization"]
-    G --> H["Job Category Classifier"]
-
-    F --> I["SQLite Database"]
-    H --> I
-    C --> I
-
-    I --> J["Candidate and Job Data"]
-    J --> K["Candidate Matching Engine"]
-
-    K --> L["Skill Match Score"]
-    K --> M["Content Relevance Score"]
-
-    L --> N["Ranked Candidate Results"]
-    M --> N
-
-    N --> O["Recruiter Dashboard"]
-    O --> P["Charts, Filters and Candidate Details"]
-    O --> Q["Excel Export"]
+```text
+                 AI RESUME SHORTLISTING SYSTEM
+                              |
+                 +------------+------------+
+                 |                         |
+          Resume Upload              Job Description
+                 |                         |
+                 +------------+------------+
+                              |
+                              v
+                     Flask Backend
+                              |
+                              v
+                      Text Extraction
+                     (PyMuPDF for PDF)
+                              |
+                              v
+                      NLP Preprocessing
+                  (NLTK and Regular Expressions)
+                              |
+                  +-----------+-----------+
+                  |                       |
+                  v                       v
+            Skill Extraction       TF-IDF Vectorization
+                  |                       |
+                  v                       v
+          Detected Candidate       ML Job Category
+                Skills               Prediction
+                  |                       |
+                  +-----------+-----------+
+                              |
+                              v
+                       SQLite Database
+                  (Candidates, Jobs, Scores)
+                              |
+                              v
+                      Matching Engine
+                              |
+                  +-----------+-----------+
+                  |                       |
+                  v                       v
+             Skill Match             Content Relevance
+             Percentage              (Cosine Similarity)
+                  |                       |
+                  +-----------+-----------+
+                              |
+                              v
+                    Candidate Ranking
+                              |
+                              v
+                    Recruiter Dashboard
+                              |
+                 +------------+------------+
+                 |            |            |
+                 v            v            v
+             Ranked       Charts and    Excel Export
+            Candidates     Filters
 ```
 
 The architecture separates the main responsibilities of the application:
